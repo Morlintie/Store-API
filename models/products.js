@@ -12,7 +12,10 @@ const productsSchema = new mongoose.Schema({
   },
   company: {
     type: String,
-    required: [true, "company name must be provided"],
+    enum: {
+      values: ["marcos", "liddy", "ikea", "caressa"],
+      message: "the company name not found",
+    },
     trim: true,
   },
 
