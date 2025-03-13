@@ -1,7 +1,5 @@
 const Product = require("../models/products.js");
 
-/*  numeric filtering */
-
 const getAll = async (req, res) => {
   const { name, company, featured, sort, fields, numericFilters } = req.query;
   const queryObject = {};
@@ -18,7 +16,8 @@ const getAll = async (req, res) => {
     queryObject.featured = featured === "true" ? true : false;
   }
   if (numericFilters) {
-    const correspondObject = {
+    //price>40,rating<=2
+    const operatorTransformer = {
       ">": "$gt",
       ">=": "$gte",
       "<": "$lt",
@@ -26,26 +25,23 @@ const getAll = async (req, res) => {
       "=": "$eq",
     };
 
-    const regex = /\b(>|<|>=|<=|=)\b/g;
-    numericFilters.replace(regex, (match) => {
-      return `-${correspondObject[match]}-`;
+    const regex = /\b(>|>=|<|<=|=)\b/g;
+    const mNumericFilters = numericFilters.replace(regex, (match) => {
+      return `-${operatorTransformer[match]}-`;
     });
-    //price-$gt-40,rating-$lte-4.5
-    const numericFiltersParsed = numericFilters.split(",");
-    let field;
-    let operator;
-    let value;
-
-    numericFiltersParsed.forEach((filter) => {
-      [field, operator, value] = filter.split("-");
-      const backupCheck = ["price", "rating"];
-      if (backupCheck.includes(field)) {
-        queryObject.field = {
-          operator: value,
+    const separateFilter = mNumericFilters.split(",");
+    const checker = ["price", "rating"];
+    separateFilter.forEach((filter) => {
+      const [field, operator, value] = filter.split("-");
+      if (checker.includes(field)) {
+        queryObject[field] = {
+          [operator]: value,
         };
       }
     });
   }
+
+  console.log(queryObject);
 
   let result = Product.find(queryObject);
 

@@ -28,6 +28,10 @@ const productsSchema = new mongoose.Schema({
     type: Number,
     default: 4.5,
   },
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const Product = mongoose.model("Products", productsSchema);
