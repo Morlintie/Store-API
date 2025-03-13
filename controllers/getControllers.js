@@ -42,7 +42,7 @@ const getAll = async (req, res) => {
       });
     }
 
-    console.log(queryObject);
+   
 
     let result = Product.find(queryObject);
 
